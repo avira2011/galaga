@@ -14,6 +14,7 @@ speed = 5
 
 enemies = []
 bullets = []
+game = True
 
 for i in range(8):
     for j in range (4):
@@ -22,18 +23,46 @@ for i in range(8):
         enemies[-1].y = 80 + 50 * j
 
 def on_key_down(key):
+    global game, bullets
     if key == keys.SPACE:
         bullets.append(Actor('bullet'))
         bullets[-1].x = ship.x
         bullets[-1].y = ship.y - 50
 
 def draw():
+    global game
     screen.clear()
     screen.fill('black')
-    for i in enemies:
-        i.draw()
-    ship.draw()
+    if game:
+        for i in enemies:
+            i.draw()
+        ship.draw()
+        for i in bullets:
+            i.draw()
+    if len (enemies) == 0:
+        game = False
+        screen.draw.text('Game Over, You have shot all the enemies', (400, 300), fontsize = 50)
+    if game == "lost":
+        screen.fill('black')
+        screen.draw.text('Sorry, you lost', (400,300), fontsize = 50)
+
+def update():
+    global game
+    if keyboard.left:
+        ship.x -= 10
+    if keyboard.right:
+        ship.x += 10
+
     for i in bullets:
-        i.draw()
+        i.y -= 10
+    
+    for i in enemies:
+        i.y += 0.5
+        for j in bullets:
+            if j.colliderect(i):
+                bullets.remove(j)
+                enemies.remove(i)
+        if i.colliderect(ship):
+            game = 'lost'
 
 pgzrun.go()
